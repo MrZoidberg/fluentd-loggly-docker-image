@@ -33,7 +33,7 @@ USER ubuntu
 WORKDIR /home/ubuntu
 
 RUN git clone https://github.com/tagomoris/xbuild.git /home/ubuntu/.xbuild
-RUN /home/ubuntu/.xbuild/ruby-install 2.2.2 /home/ubuntu/ruby
+RUN /home/ubuntu/.xbuild/ruby-install /home/ubuntu/ruby
 
 ENV PATH /home/ubuntu/ruby/bin:$PATH
 RUN gem install fluentd -v 0.12.16
