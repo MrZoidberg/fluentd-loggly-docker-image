@@ -17,9 +17,17 @@ RUN apt-get update -y && apt-get install -y \
               libyaml-dev \
               zlib1g-dev \              
         && rm -rf /var/lib/apt/lists/*
-
+        
 RUN useradd ubuntu -d /home/ubuntu -m -U
 RUN chown -R ubuntu:ubuntu /home/ubuntu
+        
+# grab gosu for easy step-down from root
+RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
+RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.6/gosu-$(dpkg --print-architecture)" \
+	&& curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.6/gosu-$(dpkg --print-architecture).asc" \
+	&& gpg --verify /usr/local/bin/gosu.asc \
+	&& rm /usr/local/bin/gosu.asc \
+	&& chmod +x /usr/local/bin/gosu
 
 # for log storage (maybe shared with host)
 RUN mkdir -p /fluentd/log
@@ -50,11 +58,13 @@ WORKDIR /home/ubuntu
 ENV FLUENTD_OPT=""
 ENV FLUENTD_CONF="fluent.conf"
 
-EXPOSE 24224
-
 COPY ./docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
-CMD ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+EXPOSE 24224
+
+CMD ["fluentd", "-v", "-c", "/fluentd/etc/$FLUENTD_CONF", "-p", "/fluentd/plugins $FLUENTD_OPT"]
 
 ### docker run -p 24224 -v `pwd`/log: -v `pwd`/log:/home/ubuntu/log fluent/fluentd:latest
 #CMD sed -i "s#\$TOKEN#$TOKEN#" /fluentd/etc/$FLUENTD_CONF
