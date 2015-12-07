@@ -20,15 +20,7 @@ RUN apt-get update -y && apt-get install -y \
         
 RUN useradd ubuntu -d /home/ubuntu -m -U
 RUN chown -R ubuntu:ubuntu /home/ubuntu
-        
-# grab gosu for easy step-down from root
-RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
-RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.6/gosu-$(dpkg --print-architecture)" \
-	&& curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.6/gosu-$(dpkg --print-architecture).asc" \
-	&& gpg --verify /usr/local/bin/gosu.asc \
-	&& rm /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu
-
+      
 # for log storage (maybe shared with host)
 RUN mkdir -p /fluentd/log
 # configuration/plugins path (default: copied from .)
@@ -42,6 +34,14 @@ WORKDIR /home/ubuntu
 
 RUN git clone https://github.com/tagomoris/xbuild.git /home/ubuntu/.xbuild
 RUN /home/ubuntu/.xbuild/ruby-install 2.2.2 /home/ubuntu/ruby
+
+# grab gosu for easy step-down from root
+RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
+RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.6/gosu-$(dpkg --print-architecture)" \
+	&& curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.6/gosu-$(dpkg --print-architecture).asc" \
+	&& gpg --verify /usr/local/bin/gosu.asc \
+	&& rm /usr/local/bin/gosu.asc \
+	&& chmod +x /usr/local/bin/gosu
 
 ENV PATH /home/ubuntu/ruby/bin:$PATH
 RUN gem install fluentd -v 0.12.16
