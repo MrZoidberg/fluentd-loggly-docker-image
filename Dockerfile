@@ -15,7 +15,10 @@ RUN apt-get update -y && apt-get install -y \
               libreadline6-dev \              
               libssl-dev \
               libyaml-dev \
-              zlib1g-dev \              
+              zlib1g-dev \       
+              ruby \
+              ruby-dev \
+              ruby-bundler \
         && rm -rf /var/lib/apt/lists/*
         
 RUN useradd ubuntu -d /home/ubuntu -m -U
@@ -32,8 +35,8 @@ RUN chown -R ubuntu:ubuntu /fluentd
 USER ubuntu
 WORKDIR /home/ubuntu
 
-RUN git clone https://github.com/tagomoris/xbuild.git /home/ubuntu/.xbuild
-RUN /home/ubuntu/.xbuild/ruby-install 2.2.2 /home/ubuntu/ruby
+#RUN git clone https://github.com/tagomoris/xbuild.git /home/ubuntu/.xbuild
+#RUN /home/ubuntu/.xbuild/ruby-install 2.2.2 /home/ubuntu/ruby
 
 # grab gosu for easy step-down from root
 RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
@@ -58,7 +61,7 @@ WORKDIR /home/ubuntu
 ENV FLUENTD_OPT=""
 ENV FLUENTD_CONF="fluent.conf"
 
-COPY ./docker-entrypoint.sh /
+ONBUILD COPY ./docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
