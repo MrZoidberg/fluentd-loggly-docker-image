@@ -37,6 +37,7 @@ RUN /home/ubuntu/.xbuild/ruby-install 2.2.2 /home/ubuntu/ruby
 
 ENV PATH /home/ubuntu/ruby/bin:$PATH
 RUN gem install fluentd -v 0.12.16
+RUN gem install fluent-plugin-loggly
 
 # RUN gem install fluent-plugin-webhdfs
 
