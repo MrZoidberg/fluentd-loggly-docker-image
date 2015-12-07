@@ -15,23 +15,12 @@ RUN apt-get update -y && apt-get install -y \
               libreadline6-dev \              
               libssl-dev \
               libyaml-dev \
-              zlib1g-dev \       
-              ruby \
-              ruby-dev \
-              ruby-bundler \
+              zlib1g-dev \              
         && rm -rf /var/lib/apt/lists/*
-        
-# grab gosu for easy step-down from root
-RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
-RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.6/gosu-$(dpkg --print-architecture)" \
-	&& curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.6/gosu-$(dpkg --print-architecture).asc" \
-	&& gpg --verify /usr/local/bin/gosu.asc \
-	&& rm /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu        
-        
+
 RUN useradd ubuntu -d /home/ubuntu -m -U
 RUN chown -R ubuntu:ubuntu /home/ubuntu
-      
+
 # for log storage (maybe shared with host)
 RUN mkdir -p /fluentd/log
 # configuration/plugins path (default: copied from .)
@@ -43,12 +32,11 @@ RUN chown -R ubuntu:ubuntu /fluentd
 USER ubuntu
 WORKDIR /home/ubuntu
 
-#RUN git clone https://github.com/tagomoris/xbuild.git /home/ubuntu/.xbuild
-#RUN /home/ubuntu/.xbuild/ruby-install 2.2.2 /home/ubuntu/ruby
+RUN git clone https://github.com/tagomoris/xbuild.git /home/ubuntu/.xbuild
+RUN /home/ubuntu/.xbuild/ruby-install 2.2.2 /home/ubuntu/ruby
 
 ENV PATH /home/ubuntu/ruby/bin:$PATH
 RUN gem install fluentd -v 0.12.16
-RUN gem install fluent-plugin-loggly
 
 # RUN gem install fluent-plugin-webhdfs
 
@@ -61,14 +49,10 @@ WORKDIR /home/ubuntu
 ENV FLUENTD_OPT=""
 ENV FLUENTD_CONF="fluent.conf"
 
-ONBUILD COPY ./docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
+COPY docker-entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 24224
 
-CMD ["fluentd", "-v", "-c", "/fluentd/etc/$FLUENTD_CONF", "-p", "/fluentd/plugins $FLUENTD_OPT"]
-
 ### docker run -p 24224 -v `pwd`/log: -v `pwd`/log:/home/ubuntu/log fluent/fluentd:latest
-#CMD sed -i "s#\$TOKEN#$TOKEN#" /fluentd/etc/$FLUENTD_CONF
-#CMD exec fluentd -v -c /fluentd/etc/$FLUENTD_CONF -p /fluentd/plugins $FLUENTD_OPT
+CMD ["fluentd", "-v", "-c", "/fluentd/etc/$FLUENTD_CONF", "-p", "/fluentd/plugins $FLUENTD_OPT"]
