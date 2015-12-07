@@ -53,5 +53,5 @@ ENV FLUENTD_CONF="fluent.conf"
 EXPOSE 24224
 
 ### docker run -p 24224 -v `pwd`/log: -v `pwd`/log:/home/ubuntu/log fluent/fluentd:latest
-CMD exec sed -i "s#\$TOKEN#$TOKEN#" /fluentd/etc/$FLUENTD_CONF
+CMD sed -i "s#\$TOKEN#$TOKEN#" /fluentd/etc/$FLUENTD_CONF
 CMD exec fluentd -c /fluentd/etc/$FLUENTD_CONF -p /fluentd/plugins $FLUENTD_OPT
