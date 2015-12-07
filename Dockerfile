@@ -53,7 +53,7 @@ ENV FLUENTD_CONF="fluent.conf"
 EXPOSE 24224
 
 COPY ./docker-entrypoint.sh /
-CMD exec /docker-entrypoint.sh
+CMD ["/docker-entrypoint.sh"]
 
 ### docker run -p 24224 -v `pwd`/log: -v `pwd`/log:/home/ubuntu/log fluent/fluentd:latest
 #CMD sed -i "s#\$TOKEN#$TOKEN#" /fluentd/etc/$FLUENTD_CONF
