@@ -9,6 +9,7 @@ USER ubuntu
 WORKDIR /home/ubuntu
 
 COPY docker-entrypoint.sh /entrypoint.sh
+RUN chown -R ubuntu:ubuntu /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 24224
