@@ -8,11 +8,10 @@ RUN gem install fluent-plugin-loggly
 USER ubuntu
 WORKDIR /home/ubuntu
 
-COPY docker-entrypoint.sh /entrypoint.sh
-RUN chown -R ubuntu:ubuntu /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY docker-entrypoint.sh /fluentd/entrypoint.sh
+#RUN chown -R ubuntu:ubuntu /entrypoint.sh
+#RUN chmod +x /entrypoint.sh
 
 EXPOSE 24224
 
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["fluentd", "-v", "-c", "/fluentd/etc/$FLUENTD_CONF", "-p", "/fluentd/plugins $FLUENTD_OPT"]
+CMD ["/bin/bash", "/fluentd/entrypoint.sh"]
